@@ -9,9 +9,7 @@
 
 ## Features
 
-* Provides easy-to-use HTTP clients for all supported AWS
-  [services][docs-services], [regions][docs-rande], and authentication
-  protocols.
+* Provides easy-to-use HTTP client
 * Is built on [Guzzle][guzzle-docs], and utilizes many of its features,
   including persistent connections, asynchronous requests, middlewares, etc.
 * Provides convenience features including easy result pagination via
@@ -59,6 +57,9 @@ echo $client->listZones();
 
 [docs-api]: http://docs.aws.amazon.com/aws-sdk-php/v3/api/index.html
 [docs-guide]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/index.html
+[docs-paginators]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/guide/paginators.html
+[docs-waiters]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/guide/waiters.html
+[docs-results]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#result-objects
 
 [aws]: http://aws.amazon.com
 [guzzle-docs]: http://guzzlephp.org
