@@ -5,7 +5,8 @@
 * [User Guide][docs-guide] – For both getting started and in-depth SDK usage information
 * [API Docs][docs-api] – For details about operations, parameters, and responses
 * [Blog][sdk-blog] – Tips & tricks, articles, and announcements
-* [Sample Project][sdk-sample] - A quick, sample project to help get you started
+* [AWS Sample Project][sdk-sample] - A quick, sample project to help get you started
+* [Generic Sample Project][generic-sample]
 
 ## Features
 
@@ -54,6 +55,8 @@ echo $client->listZones();
 [sdk-blog]: http://blogs.aws.amazon.com/php
 [sdk-twitter]: https://twitter.com/awsforphp
 [sdk-sample]: http://aws.amazon.com/developers/getting-started/php
+
+[generic-sample]: https://github.com/abdala/cloudflare-client
 
 [docs-api]: http://docs.aws.amazon.com/aws-sdk-php/v3/api/index.html
 [docs-guide]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/index.html
