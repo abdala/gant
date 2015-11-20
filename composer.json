@@ -1,0 +1,54 @@
+{
+    "name": "abdala/generic-api-client",
+    "homepage": "http://abda.la",
+    "description": "Generic API Client for PHP",
+    "keywords": ["api","generic","base"],
+    "type": "library",
+    "license": "Apache 2.0",
+    "authors": [
+        {
+            "name": "Amazon Web Services",
+            "homepage": "http://aws.amazon.com"
+        },
+        {
+            "name": "Abdala Cerqueira",
+            "homepage": "http://abda.la"
+        }
+    ],
+    "require": {
+        "php": ">=5.6",
+        "guzzlehttp/guzzle": "~6.1",
+        "guzzlehttp/psr7": "~1.0",
+        "guzzlehttp/promises": "~1.0",
+        "mtdowling/jmespath.php": "~2.2"
+    },
+    "require-dev": {
+        "ext-openssl": "*",
+        "ext-pcre": "*",
+        "ext-spl": "*",
+        "ext-json": "*",
+        "ext-dom": "*",
+        "ext-simplexml": "*",
+        "phpunit/phpunit": "~4.0",
+        "behat/behat": "~3.0",
+        "doctrine/cache": "~1.4",
+        "nette/neon": "^2.3",
+        "andrewsville/php-token-reflection": "^1.4"
+    },
+    "suggest": {
+        "ext-openssl": "Allows working with CloudFront private distributions and verifying received SNS messages",
+        "ext-curl": "To send requests using cURL",
+        "doctrine/cache": "To use the DoctrineCacheAdapter"
+    },
+    "autoload": {
+        "psr-4": {
+            "Api\\": "src/"
+        },
+        "files": ["src/functions.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Api\\Test\\": "tests/"
+        }
+    }
+}
