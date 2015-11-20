@@ -7,8 +7,6 @@ namespace Api\Test;
 
 use Api\ClientResolver;
 use Api\CommandInterface;
-use Api\Credentials\CredentialProvider;
-use Api\Credentials\Credentials;
 use Api\LruArrayCache;
 use Api\HandlerList;
 use Api\Sdk;
@@ -53,7 +51,9 @@ class ClientResolverTest extends \PHPUnit_Framework_TestCase
         $conf = $r->resolve([
             'service'      => 'dynamodb',
             'api_provider' => $provider,
-            'version'      => 'latest'
+            'version'      => 'latest',
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures',
+            ''
         ], new HandlerList());
         $this->assertArrayHasKey('api', $conf);
         $this->assertArrayHasKey('error_parser', $conf);
@@ -90,65 +90,14 @@ class ClientResolverTest extends \PHPUnit_Framework_TestCase
         $r->resolve(['foo' => 'c'], new HandlerList());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Credentials must be an
-     */
-    public function testValidatesCredentials()
-    {
-        $r = new ClientResolver([
-            'credentials' => ClientResolver::getDefaultArguments()['credentials']
-        ]);
-        $r->resolve(['credentials' => []], new HandlerList());
-    }
-
-    public function testLoadsFromDefaultChainIfNeeded()
-    {
-        $key = getenv(CredentialProvider::ENV_KEY);
-        $secret = getenv(CredentialProvider::ENV_SECRET);
-        putenv(CredentialProvider::ENV_KEY . '=foo');
-        putenv(CredentialProvider::ENV_SECRET . '=bar');
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service' => 'sqs',
-            'version' => 'latest'
-        ], new HandlerList());
-        $c = call_user_func($conf['credentials'])->wait();
-        $this->assertInstanceOf('Api\Credentials\CredentialsInterface', $c);
-        $this->assertEquals('foo', $c->getAccessKeyId());
-        $this->assertEquals('bar', $c->getSecretKey());
-        putenv(CredentialProvider::ENV_KEY . "=$key");
-        putenv(CredentialProvider::ENV_SECRET . "=$secret");
-    }
-
-    public function testCreatesFromArray()
-    {
-        $exp = time() + 500;
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service'     => 'sqs',
-            'version'     => 'latest',
-            'credentials' => [
-                'key'     => 'foo',
-                'secret'  => 'baz',
-                'token'   => 'tok',
-                'expires' => $exp
-            ]
-        ], new HandlerList());
-        $creds = call_user_func($conf['credentials'])->wait();
-        $this->assertEquals('foo', $creds->getAccessKeyId());
-        $this->assertEquals('baz', $creds->getSecretKey());
-        $this->assertEquals('tok', $creds->getSecurityToken());
-        $this->assertEquals($exp, $creds->getExpiration());
-    }
-
     public function testCanDisableRetries()
     {
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $r->resolve([
-            'service'      => 's3',
+            'service'      => 'dynamodb',
             'version'      => 'latest',
             'retries'      => 0,
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], new HandlerList());
     }
 
@@ -156,139 +105,22 @@ class ClientResolverTest extends \PHPUnit_Framework_TestCase
     {
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $r->resolve([
-            'service'      => 's3',
+            'service'      => 'dynamodb',
             'version'      => 'latest',
             'retries'      => 2,
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], new HandlerList());
-    }
-
-    public function testCanCreateNullCredentials()
-    {
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service' => 'sqs',
-            'credentials' => false,
-            'version' => 'latest'
-        ], new HandlerList());
-        $creds = call_user_func($conf['credentials'])->wait();
-        $this->assertInstanceOf('Api\Credentials\Credentials', $creds);
-        $this->assertEquals('anonymous', $conf['config']['signature_version']);
-    }
-
-    public function testCanCreateCredentialsFromProvider()
-    {
-        $c = new Credentials('foo', 'bar');
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service'     => 'sqs',
-            'credentials' => function () use ($c) {
-                return \GuzzleHttp\Promise\promise_for($c);
-            },
-            'version'     => 'latest'
-        ], new HandlerList());
-        $this->assertSame($c, call_user_func($conf['credentials'])->wait());
-    }
-
-    public function testCanCreateCredentialsFromProfile()
-    {
-        $dir = sys_get_temp_dir() . '/.aws';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0777, true);
-        }
-        $ini = <<<EOT
-[foo]
-aws_access_key_id = foo
-aws_secret_access_key = baz
-aws_session_token = tok
-EOT;
-        file_put_contents($dir . '/credentials', $ini);
-        $home = getenv('HOME');
-        putenv('HOME=' . dirname($dir));
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service' => 'sqs',
-            'profile' => 'foo',
-            'version' => 'latest'
-        ], new HandlerList());
-        $creds = call_user_func($conf['credentials'])->wait();
-        $this->assertEquals('foo', $creds->getAccessKeyId());
-        $this->assertEquals('baz', $creds->getSecretKey());
-        $this->assertEquals('tok', $creds->getSecurityToken());
-        unlink($dir . '/credentials');
-        putenv("HOME=$home");
-    }
-
-    public function testCanUseCredentialsObject()
-    {
-        $c = new Credentials('foo', 'bar');
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service'     => 'sqs',
-            'credentials' => $c,
-            'version'     => 'latest'
-        ], new HandlerList());
-        $this->assertSame($c, call_user_func($conf['credentials'])->wait());
-    }
-
-    public function testCanUseCredentialsCache()
-    {
-        $credentialsEnvironment = [
-            'home' => 'HOME',
-            'key' => CredentialProvider::ENV_KEY,
-            'secret' => CredentialProvider::ENV_SECRET,
-            'session' => CredentialProvider::ENV_SESSION,
-            'profile' => CredentialProvider::ENV_PROFILE,
-        ];
-        $envState = [];
-        foreach ($credentialsEnvironment as $key => $envVariable) {
-            $envState[$key] = getenv($envVariable);
-            putenv("$envVariable=");
-        }
-
-        $c = new Credentials('foo', 'bar');
-        $cache = new LruArrayCache;
-        $cache->set('aws_cached_credentials', $c);
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service'     => 'sqs',
-            'credentials' => $cache,
-            'version'     => 'latest'
-        ], new HandlerList());
-
-        $cached = call_user_func($conf['credentials'])->wait();
-
-        foreach ($credentialsEnvironment as $key => $envVariable) {
-            putenv("$envVariable={$envState[$key]}");
-        }
-
-        $this->assertSame($c, $cached);
-    }
-
-    public function testCanUseCustomEndpointProviderWithExtraData()
-    {
-        $p = function () {
-            return [
-                'endpoint' => 'http://foo.com',
-                'signatureVersion' => 'v4'
-            ];
-        };
-        $r = new ClientResolver(ClientResolver::getDefaultArguments());
-        $conf = $r->resolve([
-            'service' => 'sqs',
-            'endpoint_provider' => $p,
-            'version' => 'latest'
-        ], new HandlerList());
-        $this->assertEquals('v4', $conf['config']['signature_version']);
     }
 
     public function testAddsLoggerWithDebugSettings()
     {
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $conf = $r->resolve([
-            'service'      => 'sqs',
+            'service'      => 'dynamodb',
             'retry_logger' => 'debug',
             'endpoint'     => 'http://us-east-1.foo.amazonaws.com',
-            'version'      => 'latest'
+            'version'      => 'latest',
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], new HandlerList());
     }
 
@@ -297,10 +129,11 @@ EOT;
         $em = new HandlerList();
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $r->resolve([
-            'service'  => 'sqs',
+            'service'  => 'dynamodb',
             'debug'    => true,
             'endpoint' => 'http://us-east-1.foo.amazonaws.com',
-            'version'  => 'latest'
+            'version'  => 'latest',
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], $em);
     }
 
@@ -309,10 +142,11 @@ EOT;
         $em = new HandlerList();
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $r->resolve([
-            'service'  => 'sqs',
+            'service'  => 'dynamodb',
             'debug'    => false,
             'endpoint' => 'http://us-east-1.foo.amazonaws.com',
-            'version'  => 'latest'
+            'version'  => 'latest',
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], $em);
     }
 
@@ -320,9 +154,10 @@ EOT;
     {
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $conf = $r->resolve([
-            'service' => 'sqs',
+            'service' => 'dynamodb',
             'version' => 'latest',
-            'http'    => ['foo' => 'bar']
+            'http'    => ['foo' => 'bar'],
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], new HandlerList());
         $this->assertEquals('bar', $conf['http']['foo']);
     }
@@ -349,9 +184,10 @@ EOT;
      */
     public function testHasSpecificMessageForMissingVersion()
     {
+        $dir = __DIR__ . '/Api/api_provider_fixtures';
         $args = ClientResolver::getDefaultArguments()['version'];
         $r = new ClientResolver(['version' => $args]);
-        $r->resolve(['service' => 'foo'], new HandlerList());
+        $r->resolve(['service' => 'foo', 'modelsDir' => $dir], new HandlerList());
     }
 
     public function testAddsTraceMiddleware()
@@ -359,10 +195,10 @@ EOT;
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $list = new HandlerList();
         $r->resolve([
-            'service'     => 'sqs',
-            'credentials' => ['key' => 'a', 'secret' => 'b'],
+            'service'     => 'dynamodb',
             'version'     => 'latest',
-            'debug'       => ['logfn' => function ($value) use (&$str) { $str .= $value; }]
+            'debug'       => ['logfn' => function ($value) use (&$str) { $str .= $value; }],
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], $list);
         $value = $this->readAttribute($list, 'interposeFn');
         $this->assertTrue(is_callable($value));
@@ -373,15 +209,15 @@ EOT;
         $r = new ClientResolver(ClientResolver::getDefaultArguments());
         $list = new HandlerList();
         $conf = $r->resolve([
-            'service'     => 'sqs',
-            'credentials' => ['key' => 'a', 'secret' => 'b'],
+            'service'     => 'dynamodb',
             'version'     => 'latest',
             'ua_append' => 'PHPUnit/Unit',
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ], $list);
         $this->assertArrayHasKey('ua_append', $conf);
         $this->assertInternalType('array', $conf['ua_append']);
         $this->assertContains('PHPUnit/Unit', $conf['ua_append']);
-        $this->assertContains('aws-sdk-php/' . Sdk::VERSION, $conf['ua_append']);
+        $this->assertContains('generic-api-php/' . Sdk::VERSION, $conf['ua_append']);
     }
 
     public function testUserAgentAlwaysStartsWithSdkAgentString()
@@ -400,7 +236,7 @@ EOT;
 
         $request->expects($this->once())
             ->method('withHeader')
-            ->with('User-Agent', 'aws-sdk-php/' . Sdk::VERSION . ' MockBuilder');
+            ->with('User-Agent', 'generic-api-php/' . Sdk::VERSION . ' MockBuilder');
 
         $args = [];
         $list = new HandlerList(function () {});

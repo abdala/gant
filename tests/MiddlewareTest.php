@@ -10,14 +10,11 @@ use Api\Api\ApiProvider;
 use Api\Api\Service;
 use Api\Command;
 use Api\CommandInterface;
-use Api\Credentials\Credentials;
-use Api\Credentials\CredentialProvider;
 use Api\HandlerList;
 use Api\Middleware;
 use Api\MockHandler;
 use Api\Result;
 use Api\ResultInterface;
-use Api\Signature\SignatureV4;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Promise;
@@ -74,25 +71,6 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $handler = $list->resolve();
         $handler(new Command('foo'), new Request('GET', 'http://127.0.0.1'))->wait();
         $this->assertCount(0, $mock);
-    }
-
-    public function testAddsSigner()
-    {
-        $list = new HandlerList();
-        $mock = function ($command, $request) use (&$req) {
-            $req = $request;
-            return \GuzzleHttp\Promise\promise_for(
-                new Result(['@metadata' => ['statusCode' => 200]])
-            );
-        };
-        $list->setHandler($mock);
-        $creds = CredentialProvider::fromCredentials(new Credentials('foo', 'bar'));
-        $signature = new SignatureV4('a', 'b');
-        $list->appendSign(Middleware::signer($creds, Api\constantly($signature)));
-        $handler = $list->resolve();
-        $handler(new Command('foo'), new Request('GET', 'http://exmaple.com'));
-        Promise\queue()->run();
-        $this->assertTrue($req->hasHeader('Authorization'));
     }
 
     public function testBuildsRequests()
@@ -154,28 +132,6 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $handler(new Command('foo'));
     }
 
-    public function testExtractsSourceFileIntoBody()
-    {
-        $list = new HandlerList();
-        $list->setHandler(function ($command, $request) use (&$called) {
-            $called = true;
-            $this->assertNotNull($command['Body']);
-            $this->assertNull($command['SourceFile']);
-        });
-        $provider = ApiProvider::defaultProvider();
-        $data = $provider('api', 's3', 'latest');
-        $service = new Service($data, $provider);
-        $list->appendInit(Middleware::sourceFile($service));
-        $handler = $list->resolve();
-        $handler(new Command('PutObject', [
-            'Bucket'     => 'test',
-            'Key'        => 'key',
-            'SourceFile' => __FILE__
-        ]), new Request('PUT', 'http://foo.com'));
-        Promise\queue()->run();
-        $this->assertTrue($called);
-    }
-
     public function testAppliesHistory()
     {
         $h = new Api\History();
@@ -188,24 +144,6 @@ class MiddlewareTest extends \PHPUnit_Framework_TestCase
         $handler($cmd, $req);
         Promise\queue()->run();
         $this->assertCount(1, $h);
-    }
-
-    public function testCanSetContentTypeOfCommandsWithPayloads()
-    {
-        $h = new Api\History();
-        $list = new HandlerList();
-        $list->setHandler(new MockHandler([new Result()]));
-        $list->appendBuild(Middleware::contentType(['Foo']));
-        $list->appendSign(Middleware::history($h));
-        $handler = $list->resolve();
-        $payload = Psr7\stream_for(fopen(__DIR__ . '/../docs/_static/logo.png', 'r'));
-        $request = new Request('PUT', 'http://exmaple.com', [], $payload);
-        $handler(new Command('Foo'), $request);
-
-        $this->assertEquals(
-            'image/png',
-            $h->getLastRequest()->getHeaderLine('Content-Type')
-        );
     }
 
     public function testCanMapCommands()

@@ -54,7 +54,10 @@ class ApiProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testCanGetDefaultProvider()
     {
-        $p = ApiProvider::defaultProvider();
+        $dir = __DIR__ . '/api_provider_fixtures';
+        \Api\manifest('s3', $dir);
+        
+        $p = ApiProvider::defaultProvider(['modelsDir' => $dir]);
         $this->assertArrayHasKey('s3', $this->readAttribute($p, 'manifest'));
     }
 
@@ -89,7 +92,7 @@ class ApiProviderTest extends \PHPUnit_Framework_TestCase
     public function testReturnsLatestServiceData()
     {
         $p = ApiProvider::filesystem(__DIR__ . '/api_provider_fixtures');
-        $this->assertEquals(['foo' => 'bar'], $p('api', 'dynamodb', 'latest'));
+        $this->assertEquals(['foo' => 'bar', 'metadata' => ['protocol' => 'rest-json']], $p('api', 'dynamodb', 'latest'));
     }
 
     public function testReturnsNullWhenNoLatestVersionIsAvailable()

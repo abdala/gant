@@ -7,10 +7,8 @@ namespace Api\Test;
 
 use Api\Api\ErrorParser\JsonRpcErrorParser;
 use Api\Client;
-use Api\Credentials\Credentials;
 use Api\MockHandler;
 use Api\Result;
-use Api\Signature\SignatureV4;
 use Api\WrappedHttpHandler;
 use GuzzleHttp\Promise\RejectedPromise;
 
@@ -38,18 +36,17 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $config = [
             'handler'      => function () {},
-            'credentials'  => new Credentials('foo', 'bar'),
             'endpoint'     => 'http://example.com',
             'serializer'   => function () {},
             'api_provider' => $this->getApiProvider(),
             'service'      => 'foo',
             'error_parser' => function () {},
-            'version'      => 'latest'
+            'version'      => 'latest',
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ];
 
         $client = new Client($config);
         $this->assertSame($config['handler'], $this->readAttribute($client->getHandlerList(), 'handler'));
-        $this->assertSame($config['credentials'], $client->getCredentials()->wait());
         $this->assertEquals('foo', $client->getApi()->getEndpointPrefix());
     }
 
@@ -217,15 +214,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         //@todo
     }
 
-    public function testCanGetSignatureProvider()
-    {
-        $client = $this->createClient([]);
-        $ref = new \ReflectionMethod($client, 'getSignatureProvider');
-        $ref->setAccessible(true);
-        $provider = $ref->invoke($client);
-        $this->assertTrue(is_callable($provider));
-    }
-
     private function createClient(array $service = [], array $config = [])
     {
         $apiProvider = function ($type) use ($service, $config) {
@@ -248,14 +236,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         return new Client($config + [
             'handler'      => new MockHandler(),
-            'credentials'  => new Credentials('foo', 'bar'),
-            'signature'    => new SignatureV4('foo', 'bar'),
             'endpoint'     => 'http://example.com',
             'service'      => 'foo',
             'api_provider' => $apiProvider,
             'serializer'   => function () {},
             'error_parser' => function () {},
-            'version'      => 'latest'
+            'version'      => 'latest',
+            'modelsDir'    => __DIR__ . '/Api/api_provider_fixtures'
         ]);
     }
 }

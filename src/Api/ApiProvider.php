@@ -6,6 +6,7 @@
 namespace Api\Api;
 
 use Api\Exception\UnresolvedApiException;
+use InvalidArgumentException as IAE;
 
 /**
  * API providers.
@@ -95,6 +96,10 @@ class ApiProvider
      */
     public static function defaultProvider(array $args)
     {
+        if (!isset($args['modelsDir'])) {
+            throw new IAE('Missing required client configuration options');
+        }
+        
         return new self($args['modelsDir'], \Api\manifest());
     }
 

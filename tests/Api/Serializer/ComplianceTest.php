@@ -83,6 +83,7 @@ class ComplianceTest extends \PHPUnit_Framework_TestCase
             'serializer'   => Service::createSerializer($service, $ep),
             'version'      => 'latest',
             'validate'     => false,
+            'modelsDir'    => __DIR__ . '/../api_provider_fixtures'
         ]);
 
         $command = $client->getCommand($name, $args);

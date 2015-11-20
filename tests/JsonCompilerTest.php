@@ -16,7 +16,7 @@ class JsonCompilerTest extends \PHPUnit_Framework_TestCase
 
     public function setup()
     {
-        $this->models = realpath(__DIR__ . '/../src/data');
+        $this->models = realpath(__DIR__ . '/Api/api_provider_fixtures');
     }
 
     public function testDecodesJsonToArray()

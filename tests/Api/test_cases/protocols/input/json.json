@@ -37,7 +37,7 @@
           "body": "{\"Name\": \"myname\"}",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "uri": "/"
         }
@@ -79,7 +79,7 @@
           "body": "{\"TimeArg\": 1422172800}",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "uri": "/"
         }
@@ -132,7 +132,7 @@
           "body": "{\"BlobArg\": \"Zm9v\"}",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "uri": "/"
         }
@@ -154,7 +154,7 @@
           "body": "{\"BlobMap\": {\"key1\": \"Zm9v\", \"key2\": \"YmFy\"}}",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "uri": "/"
         }
@@ -205,7 +205,7 @@
           "body": "{\"ListParam\": [\"Zm9v\", \"YmFy\"]}",
           "uri": "/",
           "headers": {"X-Amz-Target": "com.amazonaws.foo.OperationName",
-                      "Content-Type": "application/x-amz-json-1.1"}
+                      "Content-Type": "application/json"}
         }
       }
     ]
@@ -279,7 +279,7 @@
           "uri": "/",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "body": "{\"RecursiveStruct\": {\"NoRecurse\": \"foo\"}}"
         }
@@ -302,7 +302,7 @@
           "uri": "/",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "body": "{\"RecursiveStruct\": {\"RecursiveStruct\": {\"NoRecurse\": \"foo\"}}}"
         }
@@ -329,7 +329,7 @@
           "uri": "/",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "body": "{\"RecursiveStruct\": {\"RecursiveStruct\": {\"RecursiveStruct\": {\"RecursiveStruct\": {\"NoRecurse\": \"foo\"}}}}}"
         }
@@ -357,7 +357,7 @@
           "uri": "/",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "body": "{\"RecursiveStruct\": {\"RecursiveList\": [{\"NoRecurse\": \"foo\"}, {\"NoRecurse\": \"bar\"}]}}"
         }
@@ -387,7 +387,7 @@
           "uri": "/",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "body": "{\"RecursiveStruct\": {\"RecursiveList\": [{\"NoRecurse\": \"foo\"}, {\"RecursiveStruct\": {\"NoRecurse\": \"bar\"}}]}}"
         }
@@ -415,7 +415,7 @@
           "uri": "/",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "body": "{\"RecursiveStruct\": {\"RecursiveMap\": {\"foo\": {\"NoRecurse\": \"foo\"}, \"bar\": {\"NoRecurse\": \"bar\"}}}}"
         }
@@ -469,7 +469,7 @@
           "body": "{\"Map\": {}}",
           "headers": {
             "X-Amz-Target": "com.amazonaws.foo.OperationName",
-            "Content-Type": "application/x-amz-json-1.1"
+            "Content-Type": "application/json"
           },
           "uri": "/"
         }

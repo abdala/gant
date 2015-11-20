@@ -53,7 +53,7 @@ class ComplianceTest extends \PHPUnit_Framework_TestCase
                 }
             }
         }
-
+        
         return $cases;
     }
 

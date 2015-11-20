@@ -103,7 +103,7 @@ class Service extends AbstractModel
     {
         static $mapping = [
             'json'      => 'Api\Api\ErrorParser\JsonRpcErrorParser',
-            'query'     => 'Api\Api\ErrorParser\RestJsonErrorParser',
+            'query'     => 'Api\Api\ErrorParser\XmlErrorParser',
             'rest-json' => 'Api\Api\ErrorParser\RestJsonErrorParser',
             'rest-xml'  => 'Api\Api\ErrorParser\XmlErrorParser'
         ];
@@ -126,7 +126,7 @@ class Service extends AbstractModel
     {
         static $mapping = [
             'json'      => 'Api\Api\Parser\JsonRpcParser',
-            'query'     => 'Api\Api\Parser\JsonRpcParser',
+            'query'     => 'Api\Api\Parser\QueryParser',
             'rest-json' => 'Api\Api\Parser\RestJsonParser',
             'rest-xml'  => 'Api\Api\Parser\RestXmlParser'
         ];

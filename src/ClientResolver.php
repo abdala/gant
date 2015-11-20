@@ -435,13 +435,17 @@ class ClientResolver
 
     public static function _default_endpoint_provider(array $args)
     {
+        if (!isset($args['modelsDir'])) {
+            throw new IAE('Missing required client configuration options');
+        }
+        
         return EndpointProvider::defaultProvider($args['modelsDir']);
     }
 
     public static function _missing_version(array $args)
     {
         $service = isset($args['service']) ? $args['service'] : '';
-        $versions = ApiProvider::defaultProvider()->getVersions($service);
+        $versions = ApiProvider::defaultProvider($args)->getVersions($service);
         $versions = implode("\n", array_map(function ($v) {
             return "* \"$v\"";
         }, $versions)) ?: '* (none found)';

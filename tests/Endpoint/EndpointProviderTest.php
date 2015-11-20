@@ -30,7 +30,7 @@ class EndpointProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testCreatesDefaultProvider()
     {
-        $p = EndpointProvider::defaultProvider();
+        $p = EndpointProvider::defaultProvider(__DIR__ . '/../Api/api_provider_fixtures');
         $this->assertInstanceOf('Api\Endpoint\PatternEndpointProvider', $p);
     }
 
