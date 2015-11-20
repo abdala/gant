@@ -29,7 +29,7 @@ composer require abdala/generic-api-client
 
 ### CloudFlare Client
 
-Sample project: [CloudFlare Client][https://github.com/abdala/cloudflare-client]
+Sample project: https://github.com/abdala/cloudflare-client
 
 ```php
 <?php
