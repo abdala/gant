@@ -1,4 +1,4 @@
-# Generic API client
+# GANT - Generic API client
 
 ## Resources
 
