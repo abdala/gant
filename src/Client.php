@@ -244,11 +244,11 @@ class Client implements ClientInterface
             return ['', 'Api\Exception\ApiException'];
         }
 
-        $service = explode('\\', $klass)[0];
+        $service = substr($klass, strrpos($klass, '\\') + 1, -6);
 
         return [
             strtolower($service),
-            "{$service}\\Exception\\{$service}Exception"
+            __NAMESPACE__ . "\\Exception\\{$service}Exception"
         ];
     }
 

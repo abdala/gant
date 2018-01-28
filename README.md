@@ -1,17 +1,16 @@
-# Generic API client
+# GANT - Generic API client
 
 ## Resources
 
 * [User Guide][docs-guide] – For both getting started and in-depth SDK usage information
 * [API Docs][docs-api] – For details about operations, parameters, and responses
 * [Blog][sdk-blog] – Tips & tricks, articles, and announcements
-* [Sample Project][sdk-sample] - A quick, sample project to help get you started
+* [AWS Sample Project][sdk-sample] - A quick, sample project to help get you started
+* [Generic Sample Project][generic-sample]
 
 ## Features
 
-* Provides easy-to-use HTTP clients for all supported AWS
-  [services][docs-services], [regions][docs-rande], and authentication
-  protocols.
+* Provides easy-to-use HTTP client
 * Is built on [Guzzle][guzzle-docs], and utilizes many of its features,
   including persistent connections, asynchronous requests, middlewares, etc.
 * Provides convenience features including easy result pagination via
@@ -29,7 +28,7 @@ composer require abdala/generic-api-client
 
 ### CloudFlare Client
 
-Sample project: [CloudFlare Client][https://github.com/abdala/cloudflare-client]
+Sample project: https://github.com/abdala/cloudflare-client
 
 ```php
 <?php
@@ -57,8 +56,13 @@ echo $client->listZones();
 [sdk-twitter]: https://twitter.com/awsforphp
 [sdk-sample]: http://aws.amazon.com/developers/getting-started/php
 
+[generic-sample]: https://github.com/abdala/cloudflare-client
+
 [docs-api]: http://docs.aws.amazon.com/aws-sdk-php/v3/api/index.html
 [docs-guide]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/index.html
+[docs-paginators]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/guide/paginators.html
+[docs-waiters]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/guide/waiters.html
+[docs-results]: http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#result-objects
 
 [aws]: http://aws.amazon.com
 [guzzle-docs]: http://guzzlephp.org
