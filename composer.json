@@ -4,7 +4,7 @@
     "description": "Generic API Client for PHP",
     "keywords": ["api","generic","base"],
     "type": "library",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Amazon Web Services",
